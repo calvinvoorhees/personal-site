@@ -1,0 +1,35 @@
+body {
+  margin-block-start: 2rem;
+  margin-inline-start: 2rem;
+  font-family: "Inter", sans-serif;
+  font-size: clamp(0.875rem, 3vw, 1rem);
+}
+
+h1 {
+  font-family: "Gelasio", serif;
+  font-size: clamp(1.5rem, 8vw, 3rem);
+  text-decoration: solid underline;
+  white-space: nowrap;
+}
+
+h2 {
+  font-size: clamp(1.125rem, 5vw, 2rem);
+  white-space: nowrap;
+}
+
+h3 {
+  margin-block-start: 0.25rem;
+  font-size: clamp(1rem, 4vw, 1.5rem);
+  white-space: nowrap;
+}
+
+ul {
+  font-size: clamp(0.875rem, 3vw, 1rem);
+}
+
+@media screen and (max-width: 450px) {
+  body {
+    margin-block-start: 0.25rem;
+    margin-inline-start: 0.25rem;
+  }
+}
