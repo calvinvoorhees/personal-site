@@ -30,6 +30,7 @@
         .u-caps { text-transform: uppercase; }
         .u-mono { font-family: var(--font-mono); }
 
+        /* HEADER */
         header {
             position: sticky; top: 0; z-index: 1000;
             background: rgba(0,0,0,0.9); backdrop-filter: blur(8px);
@@ -52,6 +53,7 @@
         .brand { font-family: var(--font-mono); font-weight: 600; font-size: 16px; letter-spacing: -0.5px; color: #fff; }
         .role-tag { color: #999; font-weight: 400; }
 
+        /* NAV */
         .nav-links { display: flex; gap: 40px; font-family: var(--font-mono); font-size: 15px; font-weight: 500; letter-spacing: 0px; }
         .nav-links a { text-decoration: none; color: #fff; transition: all 0.2s ease; }
         .nav-links a:hover { color: var(--accent); text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 6px; }
@@ -79,12 +81,42 @@
         .video-col:hover .unmute-btn { opacity: 1; }
         .unmute-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 900px) {
-            header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-            .nav-links { width: 100%; justify-content: space-between; font-size: 14px; }
-            .project-row { grid-template-columns: 1fr; }
-            .meta-col { border-right: none; border-bottom: var(--line); padding: 24px; }
-            .video-col { border-bottom: var(--line); }
+            header { 
+                padding: 15px 20px; 
+                flex-direction: column; /* Stack logo on top of links */
+                align-items: flex-start; 
+                gap: 20px; 
+            }
+            
+            .nav-links { 
+                width: 100%; 
+                justify-content: space-between; /* Spread links across width */
+                font-size: 13px; 
+                gap: 0; 
+                flex-wrap: wrap; 
+            }
+
+            /* Stack Video on Top, Meta on Bottom */
+            .project-row { 
+                display: flex;
+                flex-direction: column-reverse; 
+            }
+
+            .meta-col { 
+                border-right: none; 
+                border-top: var(--line); 
+                padding: 20px; 
+                min-height: auto;
+            }
+
+            .video-col { border-bottom: none; }
+            .project-title { font-size: 1.8rem; margin-bottom: 20px; }
+            
+            /* Always show unmute button on mobile */
+            .unmute-btn { opacity: 1; bottom: 10px; right: 10px; }
+            .video-col::after { opacity: 0; } /* No border on mobile */
         }
     </style>
 </head>
@@ -107,6 +139,7 @@
     </header>
 
     <main>
+        <!-- PROJECT 1 -->
         <article class="project-row" data-video-id="zbEuFbgax4I">
             <div class="meta-col">
                 <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">SISTERS:<br>LIBERTY/CLIP</h1></div>
@@ -123,13 +156,14 @@
             </div>
         </article>
 
+        <!-- PROJECT 2 -->
         <article class="project-row" data-video-id="bHKoN1Yk1xs">
             <div class="meta-col">
-                <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">SLASHER SLASHER<br></h1></div>
+                <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">SLASHER<br>SLASHER</h1></div>
                 <div class="credits-table u-caps">
                     <div class="credit-row"><span class="credit-key"></span><span class="credit-val"></span></div>
                     <div class="credit-row"><span class="credit-key">Director</span><span class="credit-val">Tamrick Else</span></div>
-                    <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">Calvin Voorhees</span></div>
+                    <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">CALVIN VOORHEES</span></div>
                 </div>
             </div>
             <div class="video-col">
@@ -139,13 +173,14 @@
             </div>
         </article>
 
-        <article class="project-row" data-video-id="QMa25zeu9EQ">
+        <!-- PROJECT 3 -->
+        <article class="project-row" data-video-id="MbtAidHEZMM">
             <div class="meta-col">
-                <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">Abandominium<br></h1></div>
+                <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">ABANDOMINIUM<br></h1></div>
                 <div class="credits-table u-caps">
                     <div class="credit-row"><span class="credit-key"></span><span class="credit-val"></span></div>
                     <div class="credit-row"><span class="credit-key">Director</span><span class="credit-val">Dom Lopez</span></div>
-                    <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">Calvin Voorhees</span></div>
+                    <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">CALVIN VOORHEES</span></div>
                 </div>
             </div>
             <div class="video-col">
@@ -172,9 +207,23 @@
                         if(e.data === YT.PlayerState.PLAYING) e.target.setPlaybackQuality('hd1080');
                     }}
                 });
+                
                 const videoCol = row.querySelector('.video-col');
-                videoCol.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
-                videoCol.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                
+                // MOBILE: Tap to Play
+                videoCol.addEventListener('click', (e) => {
+                    if(e.target.classList.contains('unmute-btn')) return;
+                    const p = players[containerId];
+                    const state = p.getPlayerState();
+                    if(state === YT.PlayerState.PLAYING) p.pauseVideo();
+                    else p.playVideo();
+                });
+
+                // DESKTOP: Hover to Play
+                if(window.innerWidth > 900) {
+                    videoCol.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
+                    videoCol.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                }
                 
                 const unmuteBtn = row.querySelector('.unmute-btn');
                 unmuteBtn.addEventListener('click', (e) => {
