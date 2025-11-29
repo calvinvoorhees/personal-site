@@ -65,15 +65,14 @@
 
         .archive-item {
             border-right: var(--line); border-bottom: var(--line); background: var(--bg); position: relative;
-            cursor: pointer; /* Make whole item clickable */
         }
 
-        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; border-bottom: 1px solid #222; }
+        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; cursor: pointer; border-bottom: 1px solid #222; }
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 10; transition: opacity 0.2s linear; }
         .video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: black; }
         .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; transform: scale(1.35); }
-        .archive-item:hover .poster { opacity: 0; }
-        .archive-item:hover .item-visual { border-bottom: 1px solid var(--accent); }
+        .item-visual:hover .poster { opacity: 0; }
+        .item-visual:hover { border-bottom: 1px solid var(--accent); }
 
         .item-meta { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
         .meta-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -87,7 +86,7 @@
             font-family: var(--font-mono); font-size: 9px; padding: 4px 8px;
             cursor: pointer; opacity: 0; transition: opacity 0.2s;
         }
-        .archive-item:hover .mini-unmute { opacity: 1; }
+        .item-visual:hover .mini-unmute { opacity: 1; }
 
         /* CINEMA OVERLAY */
         #cinema-overlay {
@@ -142,10 +141,31 @@
         }
         .cinema-audio-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 900px) {
-            header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
+            header { 
+                padding: 15px 20px; 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 15px; 
+            }
+            .nav-links { 
+                width: 100%; 
+                justify-content: space-between; 
+                font-size: 13px; 
+                gap: 0; 
+                flex-wrap: wrap;
+            }
             .archive-grid { grid-template-columns: 1fr; }
-            .item-visual { border-right: none; }
+            .archive-item { border-right: none; }
+            
+            /* Always show button */
+            .mini-unmute { opacity: 1; bottom: 10px; right: 10px; }
+            .item-visual:hover .poster { opacity: 1; } /* Save data on mobile */
+            
+            /* Cinema Mobile */
+            .cinema-container { width: 100%; height: 50vh; }
+            .cinema-close { top: 10px; right: 10px; padding: 8px 12px; }
         }
     </style>
 </head>
@@ -177,7 +197,6 @@
         
         <nav class="nav-links u-caps">
             <a href="index.html">Home</a>
-            <!-- WORK IS ACTIVE -->
             <a href="work.html" class="active-link">Work</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
@@ -211,7 +230,7 @@
                 </div>
             </div>
 
-            <div class="archive-item" data-video-id="QMa25zeu9EQ">
+            <div class="archive-item" data-video-id="MbtAidHEZMM">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('abandominium.jpg');"></div>
                     <div class="video-wrapper"><div id="player-3"></div></div>
@@ -244,7 +263,7 @@
                     'modestbranding': 1, 
                     'disablekb': 0,
                     'iv_load_policy': 3, // Disable video annotations
-                    'showinfo': 0 // Hide video title and uploader (deprecated but sometimes helps)
+                    'showinfo': 0 // Hide video title and uploader
                 },
                 events: {
                     'onStateChange': onCinemaStateChange
@@ -277,13 +296,12 @@
                     }}
                 });
 
-                // Hover Logic - now attached to the whole item
-                item.addEventListener('mouseenter', () => { 
-                    if(players[containerId].playVideo) players[containerId].playVideo(); 
-                });
-                item.addEventListener('mouseleave', () => { 
-                    if(players[containerId].pauseVideo) players[containerId].pauseVideo(); 
-                });
+                const visual = item.querySelector('.item-visual');
+                // DESKTOP HOVER
+                if(window.innerWidth > 900) {
+                    visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
+                    visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                }
 
                 const btn = item.querySelector('.mini-unmute');
                 btn.addEventListener('click', (e) => {
@@ -293,20 +311,17 @@
                     else { p.mute(); btn.style.color = "var(--fg)"; btn.style.borderColor = "var(--fg)"; }
                 });
 
-                // OPEN CINEMA - Click anywhere on the item
+                // OPEN CINEMA
                 item.addEventListener('click', (e) => {
                     if(e.target.classList.contains('mini-unmute')) return;
                     
                     const overlay = document.getElementById('cinema-overlay');
                     overlay.classList.add('active');
                     
-                    // Stop grid video
                     if(players[containerId].pauseVideo) players[containerId].pauseVideo();
 
-                    // Load Cinema
                     if(cinemaPlayer && cinemaPlayer.loadVideoById) {
                         cinemaPlayer.loadVideoById(videoId);
-                        // Reset UI
                         const muteBtn = document.getElementById('cinema-mute-btn');
                         muteBtn.innerText = "MUTE";
                         muteBtn.style.color = "#fff";
@@ -322,10 +337,8 @@
             const muteBtn = document.getElementById('cinema-mute-btn');
             const statusText = document.getElementById('status-indicator');
 
-            // Click Video to Play/Pause
             clickLayer.addEventListener('click', (e) => {
-                if(e.target === muteBtn) return; // Ignore mute button click
-                
+                if(e.target === muteBtn) return;
                 const state = cinemaPlayer.getPlayerState();
                 if(state === YT.PlayerState.PLAYING) {
                     cinemaPlayer.pauseVideo();
@@ -337,7 +350,6 @@
                 }
             });
 
-            // Mute Toggle
             muteBtn.addEventListener('click', () => {
                 if(cinemaPlayer.isMuted()) {
                     cinemaPlayer.unMute();
@@ -354,7 +366,6 @@
                 }
             });
 
-            // Close
             document.querySelector('.cinema-close').addEventListener('click', closeCinema);
             document.getElementById('cinema-overlay').addEventListener('click', (e) => {
                 if(e.target.id === 'cinema-overlay') closeCinema();
