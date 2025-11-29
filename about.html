@@ -49,7 +49,10 @@
 
         .brand-link { text-decoration: none; color: inherit; transition: opacity 0.2s; }
         .brand-link:hover { opacity: 0.7; }
+        
+        /* UPDATED: Matches Index/Work styling exactly */
         .brand { font-family: var(--font-mono); font-weight: 600; font-size: 16px; letter-spacing: -0.5px; color: #fff; }
+        .role-tag { color: #999; font-weight: 400; }
 
         .nav-links { display: flex; gap: 40px; font-family: var(--font-mono); font-size: 15px; font-weight: 500; letter-spacing: 0px; }
         .nav-links a { text-decoration: none; color: #fff; transition: all 0.2s ease; }
@@ -68,37 +71,13 @@
         .data-key { display: block; font-size: 11px; color: #666; margin-bottom: 4px; font-family: var(--font-mono); }
         .data-val { display: block; font-size: 14px; color: #fff; font-weight: 700; }
 
-        /* --- MOBILE OPTIMIZATION (NO HAMBURGER) --- */
         @media (max-width: 900px) {
-            header { 
-                padding: 15px 20px; 
-                flex-direction: column; 
-                align-items: flex-start; 
-                gap: 15px; 
-            }
-            .nav-links { 
-                width: 100%; 
-                justify-content: space-between; 
-                font-size: 13px; 
-                gap: 0; 
-                flex-wrap: wrap;
-            }
-            .info-row { 
-                grid-template-columns: 1fr; 
-                min-height: auto;
-            }
-            .info-label-col { 
-                border-right: none; 
-                border-bottom: var(--line); 
-                padding: 20px; 
-                color: var(--accent); /* Highlight labels on mobile */
-            }
-            .info-content-col { 
-                padding: 25px 20px; 
-            }
+            header { padding: 15px 20px; flex-direction: column; align-items: flex-start; gap: 15px; }
+            .nav-links { width: 100%; justify-content: space-between; font-size: 13px; gap: 0; flex-wrap: wrap; }
+            .info-row { grid-template-columns: 1fr; min-height: auto; }
+            .info-label-col { border-right: none; border-bottom: var(--line); padding: 20px; color: var(--accent); }
+            .info-content-col { padding: 25px 20px; }
             h1 { font-size: 2rem; }
-            
-            /* Stack data list vertically on mobile */
             .data-list { grid-template-columns: 1fr; gap: 15px; }
         }
     </style>
@@ -109,7 +88,7 @@
         <div class="brand-container">
             <div class="lut-icon"></div>
             <a href="index.html" class="brand-link">
-                <div class="brand u-caps">Calvin Voorhees <span class="u-dim">// Colorist</span></div>
+                <div class="brand u-caps">Calvin Voorhees <span class="role-tag">// Colorist</span></div>
             </a>
         </div>
         
@@ -122,7 +101,6 @@
     </header>
 
     <main>
-        <!-- BIO -->
         <section class="info-row">
             <div class="info-label-col u-caps">// 01. Colorist Profile</div>
             <div class="info-content-col">
@@ -133,7 +111,6 @@
             </div>
         </section>
 
-        <!-- SERVICES -->
         <section class="info-row">
             <div class="info-label-col u-caps">// 02. Scope of Work</div>
             <div class="info-content-col">
@@ -151,7 +128,6 @@
             </div>
         </section>
 
-        <!-- CONTACT -->
         <section class="info-row" style="border-bottom: none;">
             <div class="info-label-col u-caps">// 03. Inquiries</div>
             <div class="info-content-col">
@@ -160,6 +136,16 @@
             </div>
         </section>
     </main>
+
+    <script>
+        const lutIcon = document.querySelector('.lut-icon');
+        if (lutIcon) {
+            lutIcon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                lutIcon.classList.toggle('active-spin');
+            });
+        }
+    </script>
 
 </body>
 </html>
