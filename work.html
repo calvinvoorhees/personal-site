@@ -45,12 +45,7 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='url(%23grad1)' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300C9FF;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23FF00FF;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FFFF00;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'%3E%3C/path%3E%3Cpolyline points='3.27 6.96 12 12.01 20.73 6.96'%3E%3C/polyline%3E%3Cline x1='12' y1='22.08' x2='12' y2='12'%3E%3C/line%3E%3C/svg%3E");
             background-size: contain; background-repeat: no-repeat; cursor: pointer;
         }
-        
-        /* HOVER OR ACTIVE CLASS */
-        .lut-icon:hover, .lut-icon.active-spin { 
-            animation: hueRotateLoop 1.5s linear infinite; 
-        }
-
+        .lut-icon:hover { animation: hueRotateLoop 1.5s linear infinite; }
         .brand-link { text-decoration: none; color: inherit; transition: opacity 0.2s; }
         .brand-link:hover { opacity: 0.7; }
         .brand { font-family: var(--font-mono); font-weight: 600; font-size: 16px; letter-spacing: -0.5px; color: #fff; }
@@ -70,14 +65,19 @@
 
         .archive-item {
             border-right: var(--line); border-bottom: var(--line); background: var(--bg); position: relative;
+            cursor: pointer; /* Change cursor to pointer for whole box */
         }
 
-        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; cursor: pointer; border-bottom: 1px solid #222; }
+        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; border-bottom: 1px solid #222; }
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 10; transition: opacity 0.2s linear; }
         .video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: black; }
+        
+        /* THIS IS THE MAGIC TRICK FOR HIDING YOUTUBE UI */
         .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; transform: scale(1.35); }
-        .item-visual:hover .poster { opacity: 0; }
-        .item-visual:hover { border-bottom: 1px solid var(--accent); }
+        
+        /* Hover over whole item triggers visual changes */
+        .archive-item:hover .poster { opacity: 0; }
+        .archive-item:hover .item-visual { border-bottom: 1px solid var(--accent); }
 
         .item-meta { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
         .meta-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -91,7 +91,7 @@
             font-family: var(--font-mono); font-size: 9px; padding: 4px 8px;
             cursor: pointer; opacity: 0; transition: opacity 0.2s;
         }
-        .item-visual:hover .mini-unmute { opacity: 1; }
+        .archive-item:hover .mini-unmute { opacity: 1; }
 
         /* CINEMA OVERLAY */
         #cinema-overlay {
@@ -109,10 +109,10 @@
         }
         .cinema-close:hover { border-color: var(--accent); color: var(--accent); }
 
-        .cinema-container { width: 90vw; height: 80vh; position: relative; }
-        .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; } 
+        .cinema-container { width: 90vw; height: 80vh; position: relative; overflow: hidden; }
+        /* APPLY SCALE TO CINEMA TOO */
+        .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.35); } 
 
-        /* CUSTOM CONTROLS OVERLAY */
         .cinema-controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; cursor: pointer; }
         .status-text {
             position: absolute; top: 20px; left: 20px;
@@ -121,9 +121,20 @@
             opacity: 0; transition: opacity 0.3s;
         }
         
-        .bottom-bar { position: absolute; bottom: 0; left: 0; width: 100%; display: flex; align-items: flex-end; padding: 0 20px 20px 20px; }
-        .progress-track { flex-grow: 1; height: 2px; background: #333; margin-right: 20px; position: relative; }
-        .progress-fill { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; transition: width 0.1s linear; }
+        .bottom-bar {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            display: flex; align-items: flex-end; padding: 0 20px 20px 20px;
+        }
+
+        .progress-track {
+            flex-grow: 1; height: 2px; background: #333; margin-right: 20px; position: relative;
+        }
+        .progress-fill {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: var(--accent); width: 0%;
+            transition: width 0.1s linear;
+        }
+
         .cinema-audio-btn {
             background: transparent; border: 1px solid var(--fg); color: var(--fg);
             font-family: var(--font-mono); font-size: 11px; padding: 6px 12px;
@@ -149,8 +160,10 @@
         <div class="cinema-close">Close [X]</div>
         <div class="cinema-container">
             <div id="cinema-player"></div>
+            
             <div class="cinema-controls" id="cinema-click-layer">
                 <div class="status-text" id="status-indicator">PAUSED</div>
+                
                 <div class="bottom-bar">
                     <div class="progress-track"><div class="progress-fill" id="cinema-progress"></div></div>
                     <button class="cinema-audio-btn" id="cinema-mute-btn">UNMUTE</button>
@@ -224,22 +237,25 @@
         let progressInterval = null;
 
         function onYouTubeIframeAPIReady() {
+            // 1. CINEMA PLAYER (CUSTOM UI)
             cinemaPlayer = new YT.Player('cinema-player', {
                 height: '100%', width: '100%',
-                videoId: '',
-                playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'modestbranding': 1, 'disablekb': 0, 'iv_load_policy': 3, 'showinfo': 0 },
-                events: { 'onStateChange': onCinemaStateChange }
+                videoId: '', // Will load later
+                playerVars: { 
+                    'autoplay': 0, 
+                    'controls': 0, // HIDE DEFAULT UI
+                    'rel': 0, 
+                    'modestbranding': 1, 
+                    'disablekb': 0,
+                    'iv_load_policy': 3, // Disable video annotations
+                    'showinfo': 0 // Hide video title and uploader (deprecated but sometimes helps)
+                },
+                events: {
+                    'onStateChange': onCinemaStateChange
+                }
             });
 
-            // ADD LUT ICON TAP HANDLER FOR MOBILE
-            const lutIcon = document.querySelector('.lut-icon');
-            if (lutIcon) {
-                lutIcon.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    lutIcon.classList.toggle('active-spin');
-                });
-            }
-
+            // 2. GRID PLAYERS (PREVIEW)
             const items = document.querySelectorAll('.archive-item');
             items.forEach((item) => {
                 const videoId = item.dataset.videoId;
@@ -247,7 +263,18 @@
                 
                 players[containerId] = new YT.Player(containerId, {
                     videoId: videoId,
-                    playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'fs': 0, 'disablekb': 1, 'playsinline': 1, 'iv_load_policy': 3 },
+                    playerVars: { 
+                        'autoplay': 0, 
+                        'controls': 0, 
+                        'mute': 1, 
+                        'rel': 0, 
+                        'showinfo': 0, 
+                        'modestbranding': 1, 
+                        'fs': 0, 
+                        'disablekb': 1, 
+                        'playsinline': 1,
+                        'iv_load_policy': 3 // Disable video annotations
+                    },
                     events: { 'onStateChange': (e) => { 
                         if(e.data === YT.PlayerState.ENDED) e.target.playVideo(); 
                         if(e.data === YT.PlayerState.PLAYING) e.target.setPlaybackQuality('hd1080');
@@ -255,10 +282,8 @@
                 });
 
                 const visual = item.querySelector('.item-visual');
-                if(window.innerWidth > 900) {
-                    visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
-                    visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
-                }
+                visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
+                visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
 
                 const btn = item.querySelector('.mini-unmute');
                 btn.addEventListener('click', (e) => {
@@ -268,26 +293,40 @@
                     else { p.mute(); btn.style.color = "var(--fg)"; btn.style.borderColor = "var(--fg)"; }
                 });
 
-                visual.addEventListener('click', (e) => {
+                // OPEN CINEMA - Attached to the whole item box
+                item.addEventListener('click', (e) => {
+                    // Prevent if clicking unmute button
                     if(e.target.classList.contains('mini-unmute')) return;
+                    
                     const overlay = document.getElementById('cinema-overlay');
                     overlay.classList.add('active');
+                    
+                    // Stop grid video
                     if(players[containerId].pauseVideo) players[containerId].pauseVideo();
+
+                    // Load Cinema
                     if(cinemaPlayer && cinemaPlayer.loadVideoById) {
                         cinemaPlayer.loadVideoById(videoId);
+                        // Reset UI
+                        const muteBtn = document.getElementById('cinema-mute-btn');
+                        muteBtn.innerText = "MUTE";
+                        muteBtn.style.color = "#fff";
+                        muteBtn.style.borderColor = "var(--accent)";
+                        muteBtn.style.background = "var(--accent)";
                         cinemaPlayer.unMute();
                     }
                 });
             });
 
-            // ... (Cinema control logic remains the same) ...
-            
+            // 3. CINEMA CONTROLS LOGIC
             const clickLayer = document.getElementById('cinema-click-layer');
             const muteBtn = document.getElementById('cinema-mute-btn');
             const statusText = document.getElementById('status-indicator');
 
+            // Click Video to Play/Pause
             clickLayer.addEventListener('click', (e) => {
-                if(e.target === muteBtn) return;
+                if(e.target === muteBtn) return; // Ignore mute button click
+                
                 const state = cinemaPlayer.getPlayerState();
                 if(state === YT.PlayerState.PLAYING) {
                     cinemaPlayer.pauseVideo();
@@ -299,6 +338,7 @@
                 }
             });
 
+            // Mute Toggle
             muteBtn.addEventListener('click', () => {
                 if(cinemaPlayer.isMuted()) {
                     cinemaPlayer.unMute();
@@ -315,6 +355,7 @@
                 }
             });
 
+            // Close
             document.querySelector('.cinema-close').addEventListener('click', closeCinema);
             document.getElementById('cinema-overlay').addEventListener('click', (e) => {
                 if(e.target.id === 'cinema-overlay') closeCinema();
