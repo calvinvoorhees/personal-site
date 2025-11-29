@@ -68,13 +68,38 @@
         .data-key { display: block; font-size: 11px; color: #666; margin-bottom: 4px; font-family: var(--font-mono); }
         .data-val { display: block; font-size: 14px; color: #fff; font-weight: 700; }
 
+        /* --- MOBILE OPTIMIZATION (NO HAMBURGER) --- */
         @media (max-width: 900px) {
-            header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-            .nav-links { width: 100%; justify-content: space-between; font-size: 14px; }
-            .info-row { grid-template-columns: 1fr; }
-            .info-label-col { border-right: none; border-bottom: var(--line); padding: 24px; }
-            .info-content-col { padding: 24px; }
+            header { 
+                padding: 15px 20px; 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 15px; 
+            }
+            .nav-links { 
+                width: 100%; 
+                justify-content: space-between; 
+                font-size: 13px; 
+                gap: 0; 
+                flex-wrap: wrap;
+            }
+            .info-row { 
+                grid-template-columns: 1fr; 
+                min-height: auto;
+            }
+            .info-label-col { 
+                border-right: none; 
+                border-bottom: var(--line); 
+                padding: 20px; 
+                color: var(--accent); /* Highlight labels on mobile */
+            }
+            .info-content-col { 
+                padding: 25px 20px; 
+            }
             h1 { font-size: 2rem; }
+            
+            /* Stack data list vertically on mobile */
+            .data-list { grid-template-columns: 1fr; gap: 15px; }
         }
     </style>
 </head>
@@ -97,6 +122,7 @@
     </header>
 
     <main>
+        <!-- BIO -->
         <section class="info-row">
             <div class="info-label-col u-caps">// 01. Colorist Profile</div>
             <div class="info-content-col">
@@ -107,6 +133,7 @@
             </div>
         </section>
 
+        <!-- SERVICES -->
         <section class="info-row">
             <div class="info-label-col u-caps">// 02. Scope of Work</div>
             <div class="info-content-col">
@@ -124,6 +151,7 @@
             </div>
         </section>
 
+        <!-- CONTACT -->
         <section class="info-row" style="border-bottom: none;">
             <div class="info-label-col u-caps">// 03. Inquiries</div>
             <div class="info-content-col">
