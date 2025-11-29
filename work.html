@@ -72,8 +72,8 @@
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 10; transition: opacity 0.2s linear; }
         .video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: black; }
         
-        /* THIS IS THE MAGIC TRICK FOR HIDING YOUTUBE UI */
-        .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; transform: scale(1.35); }
+        /* REMOVED SCALE FROM WORK PAGE */
+        .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; }
         
         /* Hover over whole item triggers visual changes */
         .archive-item:hover .poster { opacity: 0; }
@@ -110,10 +110,15 @@
         .cinema-close:hover { border-color: var(--accent); color: var(--accent); }
 
         .cinema-container { width: 90vw; height: 80vh; position: relative; overflow: hidden; }
-        /* APPLY SCALE TO CINEMA TOO */
-        .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; transform: scale(1.35); } 
+        /* REMOVED SCALE FROM CINEMA MODE ON WORK PAGE */
+        .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; } 
 
-        .cinema-controls { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10001; cursor: pointer; }
+        /* CUSTOM CONTROLS OVERLAY */
+        .cinema-controls {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10001; cursor: pointer;
+        }
+
         .status-text {
             position: absolute; top: 20px; left: 20px;
             font-family: var(--font-mono); color: var(--accent); font-size: 12px;
@@ -282,8 +287,10 @@
                 });
 
                 const visual = item.querySelector('.item-visual');
-                visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
-                visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                if(window.innerWidth > 900) {
+                    visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
+                    visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                }
 
                 const btn = item.querySelector('.mini-unmute');
                 btn.addEventListener('click', (e) => {
