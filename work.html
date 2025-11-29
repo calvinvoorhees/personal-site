@@ -65,14 +65,15 @@
 
         .archive-item {
             border-right: var(--line); border-bottom: var(--line); background: var(--bg); position: relative;
+            cursor: pointer; /* Make whole item clickable */
         }
 
-        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; cursor: pointer; border-bottom: 1px solid #222; }
+        .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; border-bottom: 1px solid #222; }
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 10; transition: opacity 0.2s linear; }
         .video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: black; }
         .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; transform: scale(1.35); }
-        .item-visual:hover .poster { opacity: 0; }
-        .item-visual:hover { border-bottom: 1px solid var(--accent); }
+        .archive-item:hover .poster { opacity: 0; }
+        .archive-item:hover .item-visual { border-bottom: 1px solid var(--accent); }
 
         .item-meta { padding: 20px; display: flex; flex-direction: column; gap: 10px; }
         .meta-header { display: flex; justify-content: space-between; align-items: baseline; }
@@ -86,7 +87,7 @@
             font-family: var(--font-mono); font-size: 9px; padding: 4px 8px;
             cursor: pointer; opacity: 0; transition: opacity 0.2s;
         }
-        .item-visual:hover .mini-unmute { opacity: 1; }
+        .archive-item:hover .mini-unmute { opacity: 1; }
 
         /* CINEMA OVERLAY */
         #cinema-overlay {
@@ -98,13 +99,48 @@
         
         .cinema-close {
             position: absolute; top: 30px; right: 30px; font-family: var(--font-mono);
-            color: #fff; cursor: pointer; font-size: 1rem; z-index: 10000;
+            color: #fff; cursor: pointer; font-size: 1rem; z-index: 10002;
             border: 1px solid #333; padding: 10px 20px; text-transform: uppercase;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(5px);
         }
         .cinema-close:hover { border-color: var(--accent); color: var(--accent); }
 
         .cinema-container { width: 90vw; height: 80vh; position: relative; }
-        .cinema-container iframe { width: 100%; height: 100%; border: none; }
+        .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; } 
+
+        /* CUSTOM CONTROLS OVERLAY */
+        .cinema-controls {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10001; cursor: pointer;
+        }
+
+        .status-text {
+            position: absolute; top: 20px; left: 20px;
+            font-family: var(--font-mono); color: var(--accent); font-size: 12px;
+            background: rgba(0,0,0,0.7); padding: 5px 10px; border: 1px solid var(--accent);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        
+        .bottom-bar {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            display: flex; align-items: flex-end; padding: 0 20px 20px 20px;
+        }
+
+        .progress-track {
+            flex-grow: 1; height: 2px; background: #333; margin-right: 20px; position: relative;
+        }
+        .progress-fill {
+            position: absolute; top: 0; left: 0; height: 100%;
+            background: var(--accent); width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        .cinema-audio-btn {
+            background: transparent; border: 1px solid var(--fg); color: var(--fg);
+            font-family: var(--font-mono); font-size: 11px; padding: 6px 12px;
+            cursor: pointer; transition: all 0.2s;
+        }
+        .cinema-audio-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
         @media (max-width: 900px) {
             header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
@@ -119,6 +155,15 @@
         <div class="cinema-close">Close [X]</div>
         <div class="cinema-container">
             <div id="cinema-player"></div>
+            
+            <div class="cinema-controls" id="cinema-click-layer">
+                <div class="status-text" id="status-indicator">PAUSED</div>
+                
+                <div class="bottom-bar">
+                    <div class="progress-track"><div class="progress-fill" id="cinema-progress"></div></div>
+                    <button class="cinema-audio-btn" id="cinema-mute-btn">UNMUTE</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -132,6 +177,7 @@
         
         <nav class="nav-links u-caps">
             <a href="index.html">Home</a>
+            <!-- WORK IS ACTIVE -->
             <a href="work.html" class="active-link">Work</a>
             <a href="about.html">About</a>
             <a href="contact.html">Contact</a>
@@ -184,13 +230,28 @@
     <script>
         const players = {};
         let cinemaPlayer = null;
+        let progressInterval = null;
 
         function onYouTubeIframeAPIReady() {
+            // 1. CINEMA PLAYER (CUSTOM UI)
             cinemaPlayer = new YT.Player('cinema-player', {
                 height: '100%', width: '100%',
-                playerVars: { 'autoplay': 0, 'rel': 0, 'modestbranding': 1 },
+                videoId: '', // Will load later
+                playerVars: { 
+                    'autoplay': 0, 
+                    'controls': 0, // HIDE DEFAULT UI
+                    'rel': 0, 
+                    'modestbranding': 1, 
+                    'disablekb': 0,
+                    'iv_load_policy': 3, // Disable video annotations
+                    'showinfo': 0 // Hide video title and uploader (deprecated but sometimes helps)
+                },
+                events: {
+                    'onStateChange': onCinemaStateChange
+                }
             });
 
+            // 2. GRID PLAYERS (PREVIEW)
             const items = document.querySelectorAll('.archive-item');
             items.forEach((item) => {
                 const videoId = item.dataset.videoId;
@@ -198,16 +259,31 @@
                 
                 players[containerId] = new YT.Player(containerId, {
                     videoId: videoId,
-                    playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'fs': 0, 'disablekb': 1, 'playsinline': 1 },
+                    playerVars: { 
+                        'autoplay': 0, 
+                        'controls': 0, 
+                        'mute': 1, 
+                        'rel': 0, 
+                        'showinfo': 0, 
+                        'modestbranding': 1, 
+                        'fs': 0, 
+                        'disablekb': 1, 
+                        'playsinline': 1,
+                        'iv_load_policy': 3 // Disable video annotations
+                    },
                     events: { 'onStateChange': (e) => { 
                         if(e.data === YT.PlayerState.ENDED) e.target.playVideo(); 
                         if(e.data === YT.PlayerState.PLAYING) e.target.setPlaybackQuality('hd1080');
                     }}
                 });
 
-                const visual = item.querySelector('.item-visual');
-                visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
-                visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                // Hover Logic - now attached to the whole item
+                item.addEventListener('mouseenter', () => { 
+                    if(players[containerId].playVideo) players[containerId].playVideo(); 
+                });
+                item.addEventListener('mouseleave', () => { 
+                    if(players[containerId].pauseVideo) players[containerId].pauseVideo(); 
+                });
 
                 const btn = item.querySelector('.mini-unmute');
                 btn.addEventListener('click', (e) => {
@@ -217,28 +293,106 @@
                     else { p.mute(); btn.style.color = "var(--fg)"; btn.style.borderColor = "var(--fg)"; }
                 });
 
-                visual.addEventListener('click', (e) => {
+                // OPEN CINEMA - Click anywhere on the item
+                item.addEventListener('click', (e) => {
                     if(e.target.classList.contains('mini-unmute')) return;
+                    
                     const overlay = document.getElementById('cinema-overlay');
                     overlay.classList.add('active');
+                    
+                    // Stop grid video
                     if(players[containerId].pauseVideo) players[containerId].pauseVideo();
+
+                    // Load Cinema
                     if(cinemaPlayer && cinemaPlayer.loadVideoById) {
                         cinemaPlayer.loadVideoById(videoId);
+                        // Reset UI
+                        const muteBtn = document.getElementById('cinema-mute-btn');
+                        muteBtn.innerText = "MUTE";
+                        muteBtn.style.color = "#fff";
+                        muteBtn.style.borderColor = "var(--accent)";
+                        muteBtn.style.background = "var(--accent)";
                         cinemaPlayer.unMute();
                     }
                 });
             });
 
+            // 3. CINEMA CONTROLS LOGIC
+            const clickLayer = document.getElementById('cinema-click-layer');
+            const muteBtn = document.getElementById('cinema-mute-btn');
+            const statusText = document.getElementById('status-indicator');
+
+            // Click Video to Play/Pause
+            clickLayer.addEventListener('click', (e) => {
+                if(e.target === muteBtn) return; // Ignore mute button click
+                
+                const state = cinemaPlayer.getPlayerState();
+                if(state === YT.PlayerState.PLAYING) {
+                    cinemaPlayer.pauseVideo();
+                    statusText.innerText = "PAUSED";
+                    statusText.style.opacity = 1;
+                } else {
+                    cinemaPlayer.playVideo();
+                    statusText.style.opacity = 0;
+                }
+            });
+
+            // Mute Toggle
+            muteBtn.addEventListener('click', () => {
+                if(cinemaPlayer.isMuted()) {
+                    cinemaPlayer.unMute();
+                    muteBtn.innerText = "MUTE";
+                    muteBtn.style.background = "var(--accent)";
+                    muteBtn.style.borderColor = "var(--accent)";
+                    muteBtn.style.color = "#fff";
+                } else {
+                    cinemaPlayer.mute();
+                    muteBtn.innerText = "UNMUTE";
+                    muteBtn.style.background = "transparent";
+                    muteBtn.style.borderColor = "var(--fg)";
+                    muteBtn.style.color = "var(--fg)";
+                }
+            });
+
+            // Close
             document.querySelector('.cinema-close').addEventListener('click', closeCinema);
             document.getElementById('cinema-overlay').addEventListener('click', (e) => {
                 if(e.target.id === 'cinema-overlay') closeCinema();
             });
         }
 
+        function onCinemaStateChange(event) {
+            if(event.data === YT.PlayerState.PLAYING) {
+                document.getElementById('status-indicator').style.opacity = 0;
+                startProgressLoop();
+            } else {
+                stopProgressLoop();
+            }
+        }
+
+        function startProgressLoop() {
+            stopProgressLoop();
+            progressInterval = setInterval(() => {
+                if(cinemaPlayer && cinemaPlayer.getCurrentTime) {
+                    const current = cinemaPlayer.getCurrentTime();
+                    const total = cinemaPlayer.getDuration();
+                    if(total > 0) {
+                        const percent = (current / total) * 100;
+                        document.getElementById('cinema-progress').style.width = percent + '%';
+                    }
+                }
+            }, 100);
+        }
+
+        function stopProgressLoop() {
+            if(progressInterval) clearInterval(progressInterval);
+        }
+
         function closeCinema() {
             const overlay = document.getElementById('cinema-overlay');
             overlay.classList.remove('active');
             if(cinemaPlayer && cinemaPlayer.stopVideo) cinemaPlayer.stopVideo();
+            stopProgressLoop();
         }
     </script>
 </body>
