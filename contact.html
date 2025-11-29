@@ -32,7 +32,7 @@
             -webkit-font-smoothing: antialiased;
             display: flex;
             flex-direction: column;
-            height: 100vh; /* Force full height */
+            min-height: 100vh; /* Changed to min-height for better mobile scrolling if needed */
         }
 
         .u-caps { text-transform: uppercase; }
@@ -51,7 +51,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 30px;
-            flex-shrink: 0; /* Prevent header from shrinking */
+            flex-shrink: 0; 
         }
 
         .brand-container {
@@ -115,11 +115,11 @@
             text-underline-offset: 6px !important;
         }
 
-        /* --- CONTACT SPECIFIC LAYOUT (FULL HEIGHT / NO SCROLL) --- */
+        /* --- CONTACT SPECIFIC LAYOUT --- */
         main {
-            flex-grow: 1; /* Takes up remaining space */
+            flex-grow: 1; 
             display: flex;
-            align-items: center; /* Vertically Centers Content */
+            align-items: center; 
             padding: 40px 60px;
         }
 
@@ -150,22 +150,23 @@
             font-family: var(--font-mono);
             color: var(--accent);
             font-size: 0.9rem;
-            margin-bottom: 60px; /* Spacer before email */
+            margin-bottom: 60px; 
             display: block;
         }
 
         /* Email Link */
         .email-link {
             font-family: var(--font-mono);
-            font-size: 2.5rem; /* Massive email */
+            font-size: 2.5rem; 
             color: #fff;
             text-decoration: none;
             border-bottom: 4px solid var(--accent);
             padding-bottom: 5px;
             transition: all 0.2s ease;
             display: inline-block;
-            word-break: break-all;
+            word-break: break-all; /* Allow breaking on mobile */
             margin-bottom: 20px;
+            line-height: 1.2; /* Better spacing when wrapped */
         }
 
         .email-link:hover {
@@ -180,6 +181,7 @@
             display: flex;
             gap: 40px;
             padding-top: 10px;
+            flex-wrap: wrap; /* Allow wrapping on mobile */
         }
 
         .social-item {
@@ -201,12 +203,43 @@
             border-bottom-color: transparent;
         }
 
+        /* --- MOBILE OPTIMIZATION --- */
         @media (max-width: 900px) {
-            header { padding: 20px; flex-direction: column; align-items: flex-start; gap: 20px; }
-            main { padding: 40px 30px; align-items: flex-start; }
-            h1 { font-size: 2.2rem; }
-            .email-link { font-size: 1.3rem; border-bottom-width: 2px; }
-            .social-list { flex-direction: column; gap: 15px; }
+            header { 
+                padding: 20px; 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 20px; 
+            }
+            
+            .nav-links { 
+                width: 100%; 
+                justify-content: space-between; 
+                font-size: 13px; 
+                gap: 0; 
+                flex-wrap: wrap;
+            }
+
+            main { 
+                padding: 40px 20px; /* Reduced padding */
+                align-items: flex-start; 
+            }
+            h1 { font-size: 2rem; }
+            
+            /* Responsive Email Link */
+            .email-link { 
+                font-size: 1.4rem; /* Smaller font */
+                border-bottom-width: 2px; 
+            }
+            
+            .social-list { 
+                flex-direction: column; 
+                gap: 15px; 
+            }
+            
+            .pitch-text {
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
