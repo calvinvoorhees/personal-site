@@ -40,13 +40,19 @@
         }
 
         .brand-container { display: flex; align-items: center; gap: 15px; }
+
         @keyframes hueRotateLoop { from { filter: hue-rotate(0deg); } to { filter: hue-rotate(360deg); } }
+
         .lut-icon {
             width: 24px; height: 24px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='url(%23grad1)' stroke-width='1.5' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cdefs%3E%3ClinearGradient id='grad1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2300C9FF;stop-opacity:1' /%3E%3Cstop offset='50%25' style='stop-color:%23FF00FF;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23FFFF00;stop-opacity:1' /%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'%3E%3C/path%3E%3Cpolyline points='3.27 6.96 12 12.01 20.73 6.96'%3E%3C/polyline%3E%3Cline x1='12' y1='22.08' x2='12' y2='12'%3E%3C/line%3E%3C/svg%3E");
-            background-size: contain; background-repeat: no-repeat; cursor: default;
+            background-size: contain; background-repeat: no-repeat; cursor: pointer;
         }
-        .lut-icon:hover { animation: hueRotateLoop 1.5s linear infinite; }
+        
+        /* HOVER (Desktop) OR ACTIVE CLASS (Mobile Tap) */
+        .lut-icon:hover, .lut-icon.active-spin { 
+            animation: hueRotateLoop 1.5s linear infinite; 
+        }
 
         .brand-link { text-decoration: none; color: inherit; transition: opacity 0.2s; }
         .brand-link:hover { opacity: 0.7; }
@@ -81,24 +87,23 @@
         .video-col:hover .unmute-btn { opacity: 1; }
         .unmute-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-        /* --- MOBILE OPTIMIZATION --- */
+        /* --- MOBILE OPTIMIZATION (NO HAMBURGER) --- */
         @media (max-width: 900px) {
             header { 
                 padding: 15px 20px; 
-                flex-direction: column; /* Stack logo on top of links */
+                flex-direction: column; 
                 align-items: flex-start; 
-                gap: 20px; 
+                gap: 15px; 
             }
             
             .nav-links { 
                 width: 100%; 
-                justify-content: space-between; /* Spread links across width */
+                justify-content: space-between; 
                 font-size: 13px; 
                 gap: 0; 
                 flex-wrap: wrap; 
             }
 
-            /* Stack Video on Top, Meta on Bottom */
             .project-row { 
                 display: flex;
                 flex-direction: column-reverse; 
@@ -114,9 +119,8 @@
             .video-col { border-bottom: none; }
             .project-title { font-size: 1.8rem; margin-bottom: 20px; }
             
-            /* Always show unmute button on mobile */
             .unmute-btn { opacity: 1; bottom: 10px; right: 10px; }
-            .video-col::after { opacity: 0; } /* No border on mobile */
+            .video-col::after { opacity: 0; } 
         }
     </style>
 </head>
@@ -144,7 +148,7 @@
             <div class="meta-col">
                 <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">SISTERS:<br>LIBERTY/CLIP</h1></div>
                 <div class="credits-table u-caps">
-                    <div class="credit-row"><span class="credit-key"></span><span class="credit-val"></span></div>
+                    <div class="credit-row"><span class="credit-key">Production</span><span class="credit-val">Self</span></div>
                     <div class="credit-row"><span class="credit-key">Director</span><span class="credit-val">JAXON RAY</span></div>
                     <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">CALVIN VOORHEES</span></div>
                 </div>
@@ -161,7 +165,7 @@
             <div class="meta-col">
                 <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">SLASHER<br>SLASHER</h1></div>
                 <div class="credits-table u-caps">
-                    <div class="credit-row"><span class="credit-key"></span><span class="credit-val"></span></div>
+                    <div class="credit-row"><span class="credit-key">Production</span><span class="credit-val">Self</span></div>
                     <div class="credit-row"><span class="credit-key">Director</span><span class="credit-val">Tamrick Else</span></div>
                     <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">CALVIN VOORHEES</span></div>
                 </div>
@@ -178,7 +182,7 @@
             <div class="meta-col">
                 <div><span class="year-label u-mono">[2025]</span><h1 class="project-title u-caps">ABANDOMINIUM<br></h1></div>
                 <div class="credits-table u-caps">
-                    <div class="credit-row"><span class="credit-key"></span><span class="credit-val"></span></div>
+                    <div class="credit-row"><span class="credit-key">Production</span><span class="credit-val">Self</span></div>
                     <div class="credit-row"><span class="credit-key">Director</span><span class="credit-val">Dom Lopez</span></div>
                     <div class="credit-row"><span class="credit-key">Colorist</span><span class="credit-val">CALVIN VOORHEES</span></div>
                 </div>
@@ -194,11 +198,25 @@
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const players = {};
+        
         function onYouTubeIframeAPIReady() {
             const rows = document.querySelectorAll('.project-row');
+            
+            // --- NEW: Add click listener to LUT Icon for mobile spin ---
+            const lutIcon = document.querySelector('.lut-icon');
+            if (lutIcon) {
+                lutIcon.addEventListener('click', (e) => {
+                    // Prevent any other actions
+                    e.stopPropagation();
+                    // Toggle the 'active-spin' class
+                    lutIcon.classList.toggle('active-spin');
+                });
+            }
+
             rows.forEach((row) => {
                 const videoId = row.dataset.videoId;
                 const containerId = row.querySelector('.video-wrapper > div').id;
+                
                 players[containerId] = new YT.Player(containerId, {
                     videoId: videoId,
                     playerVars: { 'autoplay': 0, 'controls': 0, 'mute': 1, 'rel': 0, 'showinfo': 0, 'modestbranding': 1, 'fs': 0, 'disablekb': 1, 'playsinline': 1 },
@@ -210,7 +228,7 @@
                 
                 const videoCol = row.querySelector('.video-col');
                 
-                // MOBILE: Tap to Play
+                // MOBILE TOUCH: Tap to Play/Pause
                 videoCol.addEventListener('click', (e) => {
                     if(e.target.classList.contains('unmute-btn')) return;
                     const p = players[containerId];
@@ -219,7 +237,7 @@
                     else p.playVideo();
                 });
 
-                // DESKTOP: Hover to Play
+                // DESKTOP HOVER
                 if(window.innerWidth > 900) {
                     videoCol.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
                     videoCol.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
