@@ -199,31 +199,32 @@
             <div class="archive-item" data-video-id="zbEuFbgax4I">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('sisters.jpg');"></div>
-                    <div class="video-wrapper"><div id="player-1"></div></div>
+                    <!-- Removed manual ID assignment, will be handled by script -->
+                    <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">SISTERS: LIBERTY/CLIP</div><div class="meta-year">[2025]</div></div>
-                    <div class="meta-tags">Director: Jaxon Ray // Color: Calvin Voorhees</div>
+                    <div class="meta-tags">Director: Jaxon Ray // Color: Calvin V.</div>
                 </div>
             </div>
 
             <div class="archive-item" data-video-id="bHKoN1Yk1xs">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('slasher.jpg');"></div>
-                    <div class="video-wrapper"><div id="player-2"></div></div>
+                    <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">SLASHER SLASHER</div><div class="meta-year">[2025]</div></div>
-                    <div class="meta-tags">Director: Tamrick Else // Color: Calvin Voorhees</div>
+                    <div class="meta-tags">Director: Tamrick Else // Color: Calvin V.</div>
                 </div>
             </div>
 
             <div class="archive-item" data-video-id="QMa25zeu9EQ">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('abandominium.jpg');"></div>
-                    <div class="video-wrapper"><div id="player-3"></div></div>
+                    <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
@@ -235,7 +236,7 @@
             <div class="archive-item" data-video-id="fMV2PuvFwe8">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('udrcabme.jpg');"></div>
-                    <div class="video-wrapper"><div id="player-1"></div></div>
+                    <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
@@ -274,11 +275,15 @@
 
             // 2. GRID PLAYERS (PREVIEW)
             const items = document.querySelectorAll('.archive-item');
-            items.forEach((item) => {
+            items.forEach((item, index) => {
                 const videoId = item.dataset.videoId;
-                const containerId = item.querySelector('.video-wrapper > div').id;
                 
-                players[containerId] = new YT.Player(containerId, {
+                // Dynamically assign a unique ID to the video container
+                const container = item.querySelector('.video-wrapper > div');
+                const uniqueId = 'player-' + index;
+                container.id = uniqueId;
+                
+                players[uniqueId] = new YT.Player(uniqueId, {
                     videoId: videoId,
                     playerVars: { 
                         'autoplay': 0, 
@@ -300,14 +305,14 @@
 
                 const visual = item.querySelector('.item-visual');
                 if(window.innerWidth > 900) {
-                    visual.addEventListener('mouseenter', () => { if(players[containerId].playVideo) players[containerId].playVideo(); });
-                    visual.addEventListener('mouseleave', () => { if(players[containerId].pauseVideo) players[containerId].pauseVideo(); });
+                    visual.addEventListener('mouseenter', () => { if(players[uniqueId].playVideo) players[uniqueId].playVideo(); });
+                    visual.addEventListener('mouseleave', () => { if(players[uniqueId].pauseVideo) players[uniqueId].pauseVideo(); });
                 }
 
                 const btn = item.querySelector('.mini-unmute');
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const p = players[containerId];
+                    const p = players[uniqueId];
                     if(p.isMuted()) { p.unMute(); btn.style.color = "var(--accent)"; btn.style.borderColor = "var(--accent)"; } 
                     else { p.mute(); btn.style.color = "var(--fg)"; btn.style.borderColor = "var(--fg)"; }
                 });
@@ -321,7 +326,7 @@
                     overlay.classList.add('active');
                     
                     // Stop grid video
-                    if(players[containerId].pauseVideo) players[containerId].pauseVideo();
+                    if(players[uniqueId].pauseVideo) players[uniqueId].pauseVideo();
 
                     // Load Cinema
                     if(cinemaPlayer && cinemaPlayer.loadVideoById) {
