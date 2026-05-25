@@ -72,7 +72,6 @@
         .poster { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; z-index: 10; transition: opacity 0.2s linear; }
         .video-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; background: black; }
         
-        /* REMOVED SCALE FROM WORK PAGE */
         .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; }
         
         /* Hover over whole item triggers visual changes */
@@ -110,7 +109,6 @@
         .cinema-close:hover { border-color: var(--accent); color: var(--accent); }
 
         .cinema-container { width: 90vw; height: 80vh; position: relative; overflow: hidden; }
-        /* REMOVED SCALE FROM CINEMA MODE ON WORK PAGE */
         .cinema-container iframe { width: 100%; height: 100%; border: none; pointer-events: none; } 
 
         /* CUSTOM CONTROLS OVERLAY */
@@ -195,33 +193,29 @@
     </header>
 
     <main>
-
         <div class="archive-grid">
 
             <div class="archive-item" data-video-id="qHgnJ8B8iP4">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('lilyratchet.jpeg');"></div>
-                    <!-- Removed manual ID assignment, will be handled by script -->
                     <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">LILY RATCHET</div><div class="meta-year">[2026]</div></div>
-                    <div class="meta-tags">Director: Dom Lopez // Color: Calvin V.</div>
+                    <div class="meta-tags">Director: Dom Lopez // Color: Calvin Voorhees</div>
                 </div>
             </div>
-        <div class="archive-grid">
 
             <div class="archive-item" data-video-id="zbEuFbgax4I">
                 <div class="item-visual">
                     <div class="poster" style="background-image: url('sisters.jpg');"></div>
-                    <!-- Removed manual ID assignment, will be handled by script -->
                     <div class="video-wrapper"><div></div></div>
                     <button class="mini-unmute">UNMUTE</button>
                 </div>
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">SISTERS: LIBERTY/CLIP</div><div class="meta-year">[2025]</div></div>
-                    <div class="meta-tags">Director: Jaxon Ray // Color: Calvin V.</div>
+                    <div class="meta-tags">Director: Jaxon Ray // Color: Calvin Voorhees</div>
                 </div>
             </div>
 
@@ -233,7 +227,7 @@
                 </div>
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">SLASHER SLASHER</div><div class="meta-year">[2025]</div></div>
-                    <div class="meta-tags">Director: Tamrick Else // Color: Calvin V.</div>
+                    <div class="meta-tags">Director: Tamrick Else // Color: Calvin Voorhees</div>
                 </div>
             </div>
 
@@ -271,30 +265,29 @@
         let progressInterval = null;
 
         function onYouTubeIframeAPIReady() {
-            // 1. CINEMA PLAYER (CUSTOM UI)
+            // 1. CINEMA PLAYER
             cinemaPlayer = new YT.Player('cinema-player', {
                 height: '100%', width: '100%',
-                videoId: '', // Will load later
+                videoId: '',
                 playerVars: { 
                     'autoplay': 0, 
-                    'controls': 0, // HIDE DEFAULT UI
+                    'controls': 0, 
                     'rel': 0, 
                     'modestbranding': 1, 
                     'disablekb': 0,
-                    'iv_load_policy': 3, // Disable video annotations
-                    'showinfo': 0 // Hide video title and uploader (deprecated but sometimes helps)
+                    'iv_load_policy': 3,
+                    'showinfo': 0 
                 },
                 events: {
                     'onStateChange': onCinemaStateChange
                 }
             });
 
-            // 2. GRID PLAYERS (PREVIEW)
+            // 2. GRID PLAYERS
             const items = document.querySelectorAll('.archive-item');
             items.forEach((item, index) => {
                 const videoId = item.dataset.videoId;
                 
-                // Dynamically assign a unique ID to the video container
                 const container = item.querySelector('.video-wrapper > div');
                 const uniqueId = 'player-' + index;
                 container.id = uniqueId;
@@ -311,7 +304,7 @@
                         'fs': 0, 
                         'disablekb': 1, 
                         'playsinline': 1,
-                        'iv_load_policy': 3 // Disable video annotations
+                        'iv_load_policy': 3 
                     },
                     events: { 'onStateChange': (e) => { 
                         if(e.data === YT.PlayerState.ENDED) e.target.playVideo(); 
@@ -333,21 +326,17 @@
                     else { p.mute(); btn.style.color = "var(--fg)"; btn.style.borderColor = "var(--fg)"; }
                 });
 
-                // OPEN CINEMA - Attached to the whole item box
+                // OPEN CINEMA
                 item.addEventListener('click', (e) => {
-                    // Prevent if clicking unmute button
                     if(e.target.classList.contains('mini-unmute')) return;
                     
                     const overlay = document.getElementById('cinema-overlay');
                     overlay.classList.add('active');
                     
-                    // Stop grid video
                     if(players[uniqueId].pauseVideo) players[uniqueId].pauseVideo();
 
-                    // Load Cinema
                     if(cinemaPlayer && cinemaPlayer.loadVideoById) {
                         cinemaPlayer.loadVideoById(videoId);
-                        // Reset UI
                         const muteBtn = document.getElementById('cinema-mute-btn');
                         muteBtn.innerText = "MUTE";
                         muteBtn.style.color = "#fff";
@@ -363,9 +352,8 @@
             const muteBtn = document.getElementById('cinema-mute-btn');
             const statusText = document.getElementById('status-indicator');
 
-            // Click Video to Play/Pause
             clickLayer.addEventListener('click', (e) => {
-                if(e.target === muteBtn) return; // Ignore mute button click
+                if(e.target === muteBtn) return;
                 
                 const state = cinemaPlayer.getPlayerState();
                 if(state === YT.PlayerState.PLAYING) {
@@ -378,7 +366,6 @@
                 }
             });
 
-            // Mute Toggle
             muteBtn.addEventListener('click', () => {
                 if(cinemaPlayer.isMuted()) {
                     cinemaPlayer.unMute();
@@ -395,7 +382,6 @@
                 }
             });
 
-            // Close
             document.querySelector('.cinema-close').addEventListener('click', closeCinema);
             document.getElementById('cinema-overlay').addEventListener('click', (e) => {
                 if(e.target.id === 'cinema-overlay') closeCinema();
