@@ -65,7 +65,7 @@
 
         .archive-item {
             border-right: var(--line); border-bottom: var(--line); background: var(--bg); position: relative;
-            cursor: pointer; /* Change cursor to pointer for whole box */
+            cursor: pointer; 
         }
 
         .item-visual { width: 100%; aspect-ratio: 16/9; position: relative; overflow: hidden; border-bottom: 1px solid #222; }
@@ -74,7 +74,6 @@
         
         .video-wrapper iframe { width: 100%; height: 100%; pointer-events: none; }
         
-        /* Hover over whole item triggers visual changes */
         .archive-item:hover .poster { opacity: 0; }
         .archive-item:hover .item-visual { border-bottom: 1px solid var(--accent); }
 
@@ -228,17 +227,6 @@
                 <div class="item-meta">
                     <div class="meta-header"><div class="meta-title">Pygmy</div><div class="meta-year">[2026]</div></div>
                     <div class="meta-tags">Director: Jacob Freiberg // Color: Calvin Voorhees</div>
-                </div>
-            </div>
-            <div class="archive-item" data-video-id="8fzw2Qz6ICs">
-                <div class="item-visual">
-                    <div class="poster" style="background-image: url('unleavened.jpeg');"></div>
-                    <div class="video-wrapper"><div></div></div>
-                    <button class="mini-unmute">UNMUTE</button>
-                </div>
-                <div class="item-meta">
-                    <div class="meta-header"><div class="meta-title">Unleavened</div><div class="meta-year">[2026]</div></div>
-                    <div class="meta-tags">Director: Raina Jablon // Color: Calvin Voorhees</div>
                 </div>
             </div>
 
